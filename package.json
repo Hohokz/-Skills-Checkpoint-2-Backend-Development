@@ -1,0 +1,20 @@
+{
+  "name": "-skills-checkpoint-2-backend-development",
+  "version": "1.0.0",
+  "description": "[Skills Checkpoint 2] Backend Development : mock up a ERD and API for do a question and answer board",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Hohokz/-Skills-Checkpoint-2-Backend-Development.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Hohokz/-Skills-Checkpoint-2-Backend-Development/issues"
+  },
+  "homepage": "https://github.com/Hohokz/-Skills-Checkpoint-2-Backend-Development#readme"
+}
