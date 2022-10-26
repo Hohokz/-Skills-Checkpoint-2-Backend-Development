@@ -76,7 +76,12 @@ postRouter.get("/", async (req, res) => {
 postRouter.get("/:questionsId", async (req, res) => {
     const questionId = req.params.questionsId;
     const results = await pool.query
-        (`select * from posts where post_id = $1`, [questionId]);
+        (`select * from posts
+         inner join comments on comments.post_id=posts.post_id
+         inner join categories on categories.category_id =posts.post_id
+         inner join posts_vote on posts_vote.post_id=posts.post_id
+         inner join comments_vote on comments_vote.comment_id=comments.comment_id
+         where posts.post_id = $1`, [questionId]);
 
     return res.json({
         data: results.rows[0],
@@ -141,11 +146,43 @@ postRouter.put("/:questionsId", async (req, res) => {
 postRouter.delete("/:questionsId", async (req, res) => {
     const questionId = req.params.questionsId;
 
-    await pool.query(`delete from posts where post_id=$1`, [questionId])
+    await pool.query(`delete from posts where posts.post_id=$1`, [questionId])
 
     return res.json({
         message: "question is gone",
     });
 });
+
+postRouter.post("/:questionsId/vote", async (req, res) => {
+    const questionId = req.params.questionsId;
+    const newPost = { ...req.body };
+
+    await pool.query(
+        `insert into vote_posts
+        (type, post_id)
+        values 
+        ($1,$2)
+        `, [newPost.type, questionId])
+
+    return res.json({
+        message: "your vote approve",
+    });
+})
+
+postRouter.post("/:questionsId/comment/vote", async (req, res) => {
+    const questionId = req.params.questionsId;
+    const newPost = { ...req.body };
+
+    await pool.query(
+        `insert into comments_vote
+        (type, comments_id)
+        values 
+        ($1,$2)
+        `, [newPost.type, questionId])
+
+    return res.json({
+        message: "your vote approve",
+    });
+})
 
 export default postRouter;
