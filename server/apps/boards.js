@@ -12,105 +12,58 @@ postRouter.get("/", async (req, res) => {
     let values = [];
 
     if (category && keywords) {
+
         query =
-            `select * from questions
 
-            inner join answers on 
-            answers.question_id = questions.question_id
+            `select *
+         from posts
+         inner join comments on comments.post_id=posts.post_id
+         inner join categories on categories.category_id =posts.post_id
+         inner join posts_vote on posts_vote.post_id=posts.post_id
+         inner join comments_vote on comments_vote.comment_id=comments.comment_id
+         where posts.title ilke $1 and categories.category_name ilke $2 `;
 
-            inner join users on 
-            users.user_id = questions.question_id
-
-            inner join profiles on 
-            profiles.user_id = users.user_id
-
-            inner join questions_catagories on 
-            questions_catagories.question_id = questions.question_id
-        
-            inner join catagorys on 
-            catagorys.catagory_id = questions_catagories.catagory_id
-
-            inner join pictures on
-            pictures.user_id = users.user_id
-
-            inner join videos on
-            videos.user_id = users.user_id
-        
-            where catagorys.name ilike $1 and title ilike $2 or keyword ilike $2
-            group by videos.video_id, pictures.picture_id,
-            catagorys.catagory_id,questions.question_id,
-            answers.answers_id, users.user_id,profiles.profile_id,
-            questions_catagories.questions_catagories_id`,
-            values = [category, keywords]
+        values = [keywords, category];
 
     } else if (keywords) {
+
         query =
-            `select * from questions
 
-            inner join answers on 
-            answers.question_id = questions.question_id
+            `select *
+         from posts
+         inner join comments on comments.post_id=posts.post_id
+         inner join categories on categories.category_id =posts.post_id
+         inner join posts_vote on posts_vote.post_id=posts.post_id
+         inner join comments_vote on comments_vote.comment_id=comments.comment_id
+         where posts.title ilke $1`;
 
-            inner join users on 
-            users.user_id = questions.question_id
+        values = [keywords];
 
-            inner join profiles on 
-            profiles.user_id = users.user_id
-
-            inner join questions_catagories on 
-            questions_catagories.question_id = questions.question_id
-        
-            inner join catagorys on 
-            catagorys.catagory_id = questions_catagories.catagory_id
-
-            inner join pictures on
-            pictures.user_id = users.user_id
-
-            inner join videos on
-            videos.user_id = users.user_id
-
-            where title ilike $1
-            
-            group by videos.video_id, pictures.picture_id,
-            catagorys.catagory_id,questions.question_id,
-            answers.answers_id, users.user_id,profiles.profile_id,
-            questions_catagories.questions_catagories_id`, values = [keywords];
 
     } else if (category) {
         query =
-            `select * from questions
 
-            inner join answers on 
-            answers.question_id = questions.question_id
+            `select *
+         from posts
+         inner join comments on comments.post_id=posts.post_id
+         inner join categories on categories.category_id =posts.post_id
+         inner join posts_vote on posts_vote.post_id=posts.post_id
+         inner join comments_vote on comments_vote.comment_id=comments.comment_id
+         where categories.category_name ilke $1 `;
 
-            inner join users on 
-            users.user_id = questions.question_id
+        values = [category];
 
-            inner join profiles on 
-            profiles.user_id = users.user_id
-
-            inner join questions_catagories on 
-            questions_catagories.question_id = questions.question_id
-        
-            inner join catagorys on 
-            catagorys.catagory_id = questions_catagories.catagory_id
-
-            inner join pictures on
-            pictures.user_id = users.user_id
-
-            inner join videos on
-            videos.user_id = users.user_id
-
-            where catagorys.name ilike $1 group by questions.title
-            
-            group by videos.video_id, pictures.picture_id,
-            catagorys.catagory_id,questions.question_id,
-            answers.answers_id, users.user_id,profiles.profile_id,
-            questions_catagories.questions_catagories_id`,
-            values = [category];
 
     } else {
         query =
-            `select * from questions`;
+
+            `select *
+         from posts
+         inner join comments on comments.post_id=posts.post_id
+         inner join categories on categories.category_id =posts.post_id
+         inner join posts_vote on posts_vote.post_id=posts.post_id
+         inner join comments_vote on comments_vote.comment_id=comments.comment_id`;
+
     }
 
     const results = await pool.query(query, values)
@@ -123,64 +76,13 @@ postRouter.get("/", async (req, res) => {
 postRouter.get("/:questionsId", async (req, res) => {
     const questionId = req.params.questionsId;
     const results = await pool.query
-        (`select * from questions
-         where questions.question_id = $1`, [questionId]);
+        (`select * from posts where post_id = $1`, [questionId]);
 
     return res.json({
         data: results.rows[0],
     });
 
 });
-
-postRouter.get("/category", async (req, res) => {
-
-    const category = req.query.catagory || "";
-
-    const results = await pool.query
-        (`select * from questions
-
-            inner join answers on 
-            answers.question_id = questions.question_id
-
-            inner join users on 
-            users.user_id = questions.question_id
-
-            inner join profiles on 
-            profiles.user_id = users.user_id
-
-            inner join questions_catagories on 
-            questions_catagories.question_id = questions.question_id
-        
-            inner join catagorys on 
-            catagorys.catagory_id = questions_catagories.catagory_id
-
-            inner join pictures on
-            pictures.user_id = users.user_id
-
-            inner join videos on
-            videos.user_id = users.user_id
-
-            inner join approvesDisapproves on 
-            approvesDisapproves.question_id = questions.question_id 
-
-            inner join answers on 
-            answers.question_id = questions.question_id
-        
-            where catagorys.name = $1  
-
-            group by videos.video_id, pictures.picture_id,
-            catagorys.catagory_id,questions.question_id,
-            answers.answers_id, users.user_id,profiles.profile_id,
-            questions_catagories.questions_catagories_id
-
-    `, [category]);
-
-    return res.json({
-        data: results.rows,
-    });
-
-
-})
 
 postRouter.post("/", async (req, res) => {
     const newPost = {
@@ -189,23 +91,20 @@ postRouter.post("/", async (req, res) => {
         updated_at: new Date(),
     };
 
-
-    await pool.query(`
-    insert into questions
-
-    (title, content, user_id, picture_id, video_id, 
-    keyword)
-
-    values ($1, $2, $3, $4, $5, $6 )`
-        , [
-            newPost.title,
-            newPost.content,
-            newPost.user_id,
-            newPost.picture_id,
-            newPost.video_id,
-            newPost.keyword,
-
-        ]);
+    await pool.query(
+        `insert into posts
+        (user_id, title, content, category_id, created_at, updated_at, attach_url)
+        values 
+        ($1,$2,$3,$4,$5,$6,$7)
+        `, [
+        newPost.user_id,
+        newPost.title,
+        newPost.content,
+        newPost.category_id,
+        newPost.created_at,
+        newPost.updated_at,
+        newPost.attach_url
+    ])
 
     return res.json({
         message: "new question complete",
@@ -213,23 +112,20 @@ postRouter.post("/", async (req, res) => {
 
 });
 
-postRouter.put("/:Id", async (req, res) => {
-
+postRouter.put("/:questionsId", async (req, res) => {
+    const questionId = req.params.questionsId;
 
     const updatedPost = {
         ...req.body,
         updated_at: new Date(),
     };
 
-    const questionId = req.params.questionsId;
-
     console.log(questionId)
 
-    await pool.query(`
-
-    update questions set title=$1, content=$2
-    where question_id=$3`,
-
+    await pool.query(
+        `
+        update posts set title=$1, content=$2
+        where post_id=$3`,
         [
             updatedPost.title,
             updatedPost.content,
@@ -242,10 +138,10 @@ postRouter.put("/:Id", async (req, res) => {
     });
 });
 
-postRouter.delete("/:id", async (req, res) => {
-    const questionId = req.params.id;
+postRouter.delete("/:questionsId", async (req, res) => {
+    const questionId = req.params.questionsId;
 
-    await pool.query(`delete from questions where question_id=$1`, [questionId])
+    await pool.query(`delete from posts where post_id=$1`, [questionId])
 
     return res.json({
         message: "question is gone",
