@@ -12,30 +12,12 @@ postRouter.get("/", async (req, res) => {
     let values = [];
 
     if (category && keywords) {
-
         query =
-
-            `select *
-         from posts
-         inner join comments on comments.post_id=posts.post_id
-         inner join categories on categories.category_id =posts.post_id
-         inner join posts_vote on posts_vote.post_id=posts.post_id
-         inner join comments_vote on comments_vote.comment_id=comments.comment_id
-         where posts.title ilke $1 and categories.category_name ilke $2 `;
 
         values = [keywords, category];
 
     } else if (keywords) {
-
         query =
-
-            `select *
-         from posts
-         inner join comments on comments.post_id=posts.post_id
-         inner join categories on categories.category_id =posts.post_id
-         inner join posts_vote on posts_vote.post_id=posts.post_id
-         inner join comments_vote on comments_vote.comment_id=comments.comment_id
-         where posts.title ilke $1`;
 
         values = [keywords];
 
@@ -43,28 +25,13 @@ postRouter.get("/", async (req, res) => {
     } else if (category) {
         query =
 
-            `select *
-         from posts
-         inner join comments on comments.post_id=posts.post_id
-         inner join categories on categories.category_id =posts.post_id
-         inner join posts_vote on posts_vote.post_id=posts.post_id
-         inner join comments_vote on comments_vote.comment_id=comments.comment_id
-         where categories.category_name ilke $1 `;
-
         values = [category];
 
 
     } else {
         query =
 
-            `select *
-         from posts
-         inner join comments on comments.post_id=posts.post_id
-         inner join categories on categories.category_id =posts.post_id
-         inner join posts_vote on posts_vote.post_id=posts.post_id
-         inner join comments_vote on comments_vote.comment_id=comments.comment_id`;
-
-    }
+}
 
     const results = await pool.query(query, values)
 
